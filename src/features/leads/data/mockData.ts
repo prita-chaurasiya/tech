@@ -1,0 +1,106 @@
+import { Lead, LeadActivity } from "../types"
+
+export const mockLeads: Lead[] = [
+  {
+    id: "L-1001",
+    name: "Acme Corp",
+    company: "Acme Corp",
+    email: "contact@acme.com",
+    phone: "+1 (555) 123-4567",
+    status: "New",
+    source: "Website",
+    owner: "Sarah Jenkins",
+    value: 50000,
+    score: 85,
+    lastContact: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+    tags: ["Enterprise", "High Priority"],
+  },
+  {
+    id: "L-1002",
+    name: "TechNova",
+    company: "TechNova Solutions",
+    email: "info@technova.io",
+    phone: "+1 (555) 987-6543",
+    status: "Qualified",
+    source: "LinkedIn",
+    owner: "Michael Chang",
+    value: 120000,
+    score: 92,
+    lastContact: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+    tags: ["SaaS", "B2B"],
+  },
+  {
+    id: "L-1003",
+    name: "Global Health",
+    company: "Global Health Systems",
+    email: "procurement@globalhealth.org",
+    phone: "+1 (555) 456-7890",
+    status: "Proposal",
+    source: "Referral",
+    owner: "Sarah Jenkins",
+    value: 300000,
+    score: 95,
+    lastContact: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+    tags: ["Healthcare", "Enterprise"],
+  },
+  {
+    id: "L-1004",
+    name: "Stark Industries",
+    company: "Stark Industries",
+    email: "tony@stark.com",
+    phone: "+1 (555) 000-0000",
+    status: "Contacted",
+    source: "Conference",
+    owner: "Alex Rivera",
+    value: 1500000,
+    score: 99,
+    lastContact: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+    tags: ["Manufacturing", "Defense"],
+  },
+  {
+    id: "L-1005",
+    name: "Wayne Enterprises",
+    company: "Wayne Enterprises",
+    email: "bruce@wayne.com",
+    phone: "+1 (555) 111-1111",
+    status: "Negotiation",
+    source: "Cold Call",
+    owner: "Michael Chang",
+    value: 800000,
+    score: 88,
+    lastContact: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
+    tags: ["Conglomerate"],
+  }
+]
+
+export const mockActivities: LeadActivity[] = [
+  {
+    id: "A-1",
+    leadId: "L-1003",
+    type: "Email",
+    content: "Sent the revised proposal for Q3 implementation.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    author: "Sarah Jenkins"
+  },
+  {
+    id: "A-2",
+    leadId: "L-1004",
+    type: "Meeting",
+    content: "Initial discovery call. Discussed scaling requirements.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    author: "Alex Rivera"
+  },
+  {
+    id: "A-3",
+    leadId: "L-1002",
+    type: "StatusChange",
+    content: "Changed status from Contacted to Qualified",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    author: "Michael Chang"
+  }
+]
