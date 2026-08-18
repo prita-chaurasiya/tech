@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Orbit, ArrowRight, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 export function OTPVerificationPage() {
   const navigate = useNavigate()
@@ -35,10 +36,16 @@ export function OTPVerificationPage() {
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault()
+    if (otp.join("").length !== 6) {
+      toast.error("Please enter a 6-digit code.")
+      return
+    }
+    
     setIsLoading(true)
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
+      toast.success("Code verified successfully.")
       navigate("/reset-password")
     }, 1000)
   }
@@ -87,7 +94,7 @@ export function OTPVerificationPage() {
       <div className="mt-8 text-center text-sm flex flex-col space-y-4">
         <span className="text-muted-foreground">
           Didn't receive the email?{" "}
-          <button className="text-primary font-medium hover:underline">Click to resend</button>
+          <button className="text-primary font-medium hover:underline" onClick={() => toast.success("Verification code resent.")} type="button">Click to resend</button>
         </span>
         <Link to="/login" className="text-muted-foreground hover:text-foreground inline-flex justify-center items-center transition-colors">
           <ArrowLeft size={16} className="mr-2" />

@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useDataStore } from "@/store/useDataStore"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Target, Building2, Calendar, FileText, Bot, DollarSign, CheckCircle2, ChevronRight } from "lucide-react"
+import { ArrowLeft, Target, Building2, Calendar, FileText, Bot, DollarSign, CheckCircle2, ChevronRight, Activity, Users, FileSignature, ShieldAlert, FileBarChart, Handshake } from "lucide-react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export function OpportunityDetailPage() {
   const { id } = useParams()
@@ -13,7 +14,6 @@ export function OpportunityDetailPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const opportunities = useDataStore((state) => state.opportunities)
   
-  // Find the mock opportunity or fallback to the first one
   const opp = opportunities.find(o => o.id === id) || opportunities[0]
 
   const formatCurrency = (val: number) => {
@@ -25,10 +25,13 @@ export function OpportunityDetailPage() {
   const STAGES = ["New", "Qualified", "Discovery", "Proposal", "Negotiation", "Decision Pending", "Closed Won"]
   const currentStageIndex = STAGES.indexOf(opp.stage)
 
+  const expectedRev = Number(opp.expectedRevenue) || 0;
+  const weightedRev = (expectedRev * (opp.probability / 100));
+
   return (
-    <div className="flex flex-col h-full gap-6 pb-8">
+    <div className="flex flex-col h-full gap-6 pb-10">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <Button variant="ghost" size="icon" onClick={() => navigate("/pipeline")}>
           <ArrowLeft size={18} />
         </Button>
@@ -37,19 +40,23 @@ export function OpportunityDetailPage() {
             <h1 className="text-3xl font-bold tracking-tight">{opp.name}</h1>
             <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-transparent">{opp.stage}</Badge>
           </div>
-          <div className="flex items-center gap-4 text-muted-foreground text-sm mt-1">
+          <div className="flex items-center gap-4 text-muted-foreground text-sm mt-1 flex-wrap">
             <span className="flex items-center gap-1.5"><Building2 size={14} /> {opp.customerName}</span>
             <span className="flex items-center gap-1.5"><Calendar size={14} /> Expected Close: {opp.closeDate ? new Date(opp.closeDate).toLocaleDateString() : 'N/A'}</span>
           </div>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline">Edit Deal</Button>
-          <Button>Generate Proposal</Button>
+        <div className="md:ml-auto flex flex-wrap items-center gap-2 w-full md:w-auto mt-4 md:mt-0">
+          <Button variant="outline" onClick={() => {
+              import("sonner").then(m => m.toast.info("Feature coming soon"))
+            }} className="flex-1 md:flex-none">Edit Deal</Button>
+          <Button onClick={() => {
+              import("sonner").then(m => m.toast.info("Feature coming soon"))
+            }} className="flex-1 md:flex-none">Generate Proposal</Button>
         </div>
       </div>
 
       {/* Stage Progress Bar */}
-      <Card className="bg-card/50 backdrop-blur-sm shadow-sm border overflow-hidden">
+      <Card className="bg-card/50 backdrop-blur-sm shadow-sm border overflow-hidden hidden md:block">
         <CardContent className="p-0">
           <div className="flex w-full">
             {STAGES.map((stage, i) => {
@@ -64,11 +71,10 @@ export function OpportunityDetailPage() {
                     ${!isCompleted && !isCurrent ? 'bg-muted/30 text-muted-foreground' : ''}
                   `}
                 >
-                  <span className="relative z-10 flex items-center gap-1.5">
+                  <span className="relative z-10 flex items-center gap-1.5 whitespace-nowrap px-2">
                     {isCompleted && <CheckCircle2 size={14} />}
                     {stage}
                   </span>
-                  {/* Arrow shape overlay */}
                   {i < STAGES.length - 1 && (
                     <div className="absolute right-[-10px] top-0 bottom-0 w-[20px] z-20 flex items-center justify-center">
                       <ChevronRight size={24} className={isCurrent ? "text-primary" : isCompleted ? "text-primary/20" : "text-muted"} />
@@ -85,12 +91,12 @@ export function OpportunityDetailPage() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6 min-w-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col">
-            <TabsList className="w-full justify-start border-b rounded-none h-12 bg-transparent p-0 space-x-6">
-              {["Overview", "Timeline", "Proposals", "Competitors", "Notes"].map(tab => (
+            <TabsList className="w-full justify-start border-b rounded-none h-auto flex-wrap bg-transparent p-0 gap-x-6 gap-y-2">
+              {["Overview", "Timeline", "Proposal", "Negotiation", "Competitors", "Decision Maker", "Attachments", "Notes"].map(tab => (
                 <TabsTrigger 
                   key={tab} 
                   value={tab.toLowerCase()}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 font-medium"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-1 py-3 font-medium"
                 >
                   {tab}
                 </TabsTrigger>
@@ -100,51 +106,124 @@ export function OpportunityDetailPage() {
             <div className="flex-1 py-6">
               <TabsContent value="overview" className="mt-0 space-y-6">
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card>
-                    <CardContent className="p-6">
-                      <div className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                        <DollarSign size={16} /> Deal Value
+                    <CardContent className="p-4 md:p-6">
+                      <div className="text-sm font-medium text-muted-foreground mb-1 md:mb-2 flex items-center gap-2">
+                        <DollarSign size={16} className="hidden sm:block" /> Deal Value
                       </div>
-                      <div className="text-3xl font-bold">{formatCurrency(Number(opp.expectedRevenue) || 0)}</div>
+                      <div className="text-xl md:text-3xl font-bold">{formatCurrency(expectedRev)}</div>
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardContent className="p-6">
-                      <div className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                        <Target size={16} /> Probability
+                    <CardContent className="p-4 md:p-6">
+                      <div className="text-sm font-medium text-muted-foreground mb-1 md:mb-2 flex items-center gap-2">
+                        <Target size={16} className="hidden sm:block" /> Probability
                       </div>
-                      <div className="text-3xl font-bold text-primary">{opp.probability}%</div>
+                      <div className="text-xl md:text-3xl font-bold text-primary">{opp.probability}%</div>
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardContent className="p-6">
-                      <div className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                        <Calendar size={16} /> Deal Age
+                    <CardContent className="p-4 md:p-6">
+                      <div className="text-sm font-medium text-muted-foreground mb-1 md:mb-2 flex items-center gap-2">
+                        <FileBarChart size={16} className="hidden sm:block" /> Weighted Rev
                       </div>
-                      <div className="text-3xl font-bold">14<span className="text-lg text-muted-foreground font-normal ml-1">days</span></div>
+                      <div className="text-xl md:text-3xl font-bold text-emerald-500">{formatCurrency(weightedRev)}</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4 md:p-6">
+                      <div className="text-sm font-medium text-muted-foreground mb-1 md:mb-2 flex items-center gap-2">
+                        <Calendar size={16} className="hidden sm:block" /> Days in Stage
+                      </div>
+                      <div className="text-xl md:text-3xl font-bold">14<span className="text-sm md:text-lg text-muted-foreground font-normal ml-1">days</span></div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Next Action</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 text-sm">
-                      <div className="font-semibold text-primary mb-1">Follow up on Pricing Proposal</div>
-                      <div className="text-muted-foreground">Scheduled for tomorrow with John Doe (VP of Engineering). Ensure you address the security compliance questions raised in the last meeting.</div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Next Action</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 text-sm">
+                        <div className="font-semibold text-primary mb-1">Follow up on Pricing Proposal</div>
+                        <div className="text-muted-foreground">Scheduled for tomorrow with John Doe (VP of Engineering). Ensure you address the security compliance questions raised in the last meeting.</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Key Decision Maker</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="bg-primary/10 text-primary">JD</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-semibold">John Doe</div>
+                          <div className="text-sm text-muted-foreground">VP of Engineering</div>
+                        </div>
+                        <Badge variant="outline" className="ml-auto text-emerald-500 border-emerald-500/20 bg-emerald-500/10">Champion</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
               </TabsContent>
               
               <TabsContent value="timeline" className="mt-0">
                 <Card>
-                  <CardContent className="p-12 flex flex-col items-center justify-center text-center text-muted-foreground">
-                    Deal Timeline (Coming Soon)
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Activity size={18} /> Activity Timeline</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-12 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <p>Timeline of emails, calls, meetings and stage changes.</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="proposal" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><FileSignature size={18} /> Proposal Generation</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-12 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <p>Generate, send, and track CPQ proposals.</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="negotiation" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Handshake size={18} /> Negotiation History</CardTitle>
+                  </CardHeader>
+                  <CardContent className="py-12 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <p>Track discount requests, margin approvals, and counter-offers.</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="competitors" className="mt-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><ShieldAlert size={18} /> Competitors</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-4 border rounded-lg flex justify-between items-center bg-card">
+                      <div>
+                        <div className="font-semibold text-lg">Salesforce</div>
+                        <div className="text-sm text-muted-foreground">Identified as main competitor in Discovery.</div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="destructive" className="mb-1">High Threat</Badge>
+                        <div className="text-xs text-muted-foreground">Win Rate vs Salesforce: 68%</div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>

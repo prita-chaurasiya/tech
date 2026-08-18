@@ -9,9 +9,10 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { navGroups } from "@/config/nav"
+import { toast } from "sonner"
 
 export function Sidebar() {
-  const { isSidebarOpen, toggleSidebar } = useAppStore()
+  const { isSidebarOpen, toggleSidebar, user } = useAppStore()
   const navigate = useNavigate()
 
   return (
@@ -74,20 +75,26 @@ export function Sidebar() {
       {/* User Profile */}
       <div className="p-4 border-t border-sidebar-border/50 shrink-0 mt-auto">
         <button 
-          onClick={() => navigate("/login")}
+          onClick={() => {
+            useAppStore.getState().setAuthenticated(false)
+            toast.success("Logged out successfully.")
+            navigate("/login")
+          }}
           className={cn(
             "w-full flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-sidebar-accent group text-left",
             !isSidebarOpen && "justify-center"
           )}
         >
           <Avatar className="h-9 w-9 border-2 border-background shadow-sm shrink-0">
-            <AvatarFallback className="bg-primary/20 text-primary font-bold">JD</AvatarFallback>
+            <AvatarFallback className="bg-primary/20 text-primary font-bold">
+              {user?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U'}
+            </AvatarFallback>
           </Avatar>
           {isSidebarOpen && (
             <div className="flex-1 min-w-0 flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-sm font-semibold truncate group-hover:text-sidebar-accent-foreground">Jane Doe</span>
-                <span className="text-xs text-muted-foreground truncate group-hover:text-sidebar-accent-foreground/80">CEO</span>
+                <span className="text-sm font-semibold truncate group-hover:text-sidebar-accent-foreground">{user?.name || "User"}</span>
+                <span className="text-xs text-muted-foreground truncate group-hover:text-sidebar-accent-foreground/80">{user?.role || "Member"}</span>
               </div>
               <LogOut size={18} className="text-muted-foreground group-hover:text-sidebar-accent-foreground transition-colors" />
             </div>

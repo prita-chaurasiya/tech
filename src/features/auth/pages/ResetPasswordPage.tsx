@@ -4,17 +4,39 @@ import { Orbit, ArrowRight, ArrowLeft, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+
+const resetPasswordSchema = z.object({
+  password: z.string().min(8, "Password must be at least 8 characters long."),
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters long."),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+})
+
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>
 
 export function ResetPasswordPage() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleReset = (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
+  })
+
+  const onSubmit = (data: ResetPasswordFormValues) => {
     setIsLoading(true)
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
+      toast.success("Password has been successfully reset.")
       navigate("/login")
     }, 1000)
   }
@@ -34,7 +56,7 @@ export function ResetPasswordPage() {
         </p>
       </div>
 
-      <form onSubmit={handleReset} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="password">New password</Label>
           <div className="relative">
@@ -45,28 +67,34 @@ export function ResetPasswordPage() {
               id="password" 
               type="password" 
               placeholder="••••••••" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("password")}
             />
           </div>
+          {errors.password && (
+            <p className="text-sm text-destructive">{errors.password.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirm-password">Confirm new password</Label>
+          <Label htmlFor="confirmPassword">Confirm new password</Label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               <Lock size={16} />
             </div>
             <Input 
-              id="confirm-password" 
+              id="confirmPassword" 
               type="password" 
               placeholder="••••••••" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("confirmPassword")}
             />
           </div>
+          {errors.confirmPassword && (
+            <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+          )}
         </div>
 
         <Button type="submit" className="w-full h-11 text-base font-medium mt-6 group/btn" disabled={isLoading}>

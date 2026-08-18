@@ -4,17 +4,35 @@ import { Orbit, ArrowRight, ArrowLeft, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+})
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleReset = (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+  })
+
+  const onSubmit = (data: ForgotPasswordFormValues) => {
     setIsLoading(true)
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
+      toast.success("Reset instructions sent to your email.")
       navigate("/otp-verification")
     }, 1000)
   }
@@ -34,7 +52,7 @@ export function ForgotPasswordPage() {
         </p>
       </div>
 
-      <form onSubmit={handleReset} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
@@ -45,11 +63,14 @@ export function ForgotPasswordPage() {
               id="email" 
               type="email" 
               placeholder="name@company.com" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-destructive">{errors.email.message}</p>
+          )}
         </div>
 
         <Button type="submit" className="w-full h-11 text-base font-medium mt-6 group/btn" disabled={isLoading}>

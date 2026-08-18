@@ -4,17 +4,52 @@ import { Orbit, ArrowRight, Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { useAppStore } from "@/store/useAppStore"
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters long."),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const { setAuthenticated, setUser } = useAppStore()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  const onSubmit = (data: LoginFormValues) => {
     setIsLoading(true)
-    // Simulate login API call
     setTimeout(() => {
       setIsLoading(false)
+      const { registeredUsers } = useAppStore.getState()
+      const user = registeredUsers.find(u => u.email === data.email)
+
+      if (!user) {
+        toast.error("No account found with this email. Please sign up.")
+        return
+      }
+
+      if (user.password !== data.password) {
+        toast.error("Invalid email or password.")
+        return
+      }
+
+      toast.success("Successfully logged in.")
+      setAuthenticated(true)
+      setUser(user)
       navigate("/")
     }, 1000)
   }
@@ -34,7 +69,7 @@ export function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={handleLogin} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
@@ -45,11 +80,14 @@ export function LoginPage() {
               id="email" 
               type="email" 
               placeholder="name@company.com" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-destructive">{errors.email.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -67,11 +105,14 @@ export function LoginPage() {
               id="password" 
               type="password" 
               placeholder="••••••••" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("password")}
             />
           </div>
+          {errors.password && (
+            <p className="text-sm text-destructive">{errors.password.message}</p>
+          )}
         </div>
 
         <Button type="submit" className="w-full h-11 text-base font-medium mt-6 group/btn" disabled={isLoading}>
@@ -83,7 +124,7 @@ export function LoginPage() {
       <div className="mt-8 text-center text-sm">
         <span className="text-muted-foreground">Don't have an account? </span>
         <Link to="/register" className="text-primary font-medium hover:underline">
-          Create an account
+          Sign up
         </Link>
       </div>
     </>

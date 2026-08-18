@@ -4,18 +4,55 @@ import { Orbit, ArrowRight, Mail, Lock, User, Building } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { useAppStore } from "@/store/useAppStore"
+
+const registerSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters."),
+  lastName: z.string().min(2, "Last name must be at least 2 characters."),
+  company: z.string().min(2, "Company must be at least 2 characters."),
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters long."),
+})
+
+type RegisterFormValues = z.infer<typeof registerSchema>
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const { setAuthenticated, setUser } = useAppStore()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  })
+
+  const onSubmit = (data: RegisterFormValues) => {
     setIsLoading(true)
-    // Simulate register API call
     setTimeout(() => {
       setIsLoading(false)
-      navigate("/")
+      const { registeredUsers, registerUser } = useAppStore.getState()
+      
+      if (registeredUsers.find(u => u.email === data.email)) {
+        toast.error("An account with this email already exists.")
+        return
+      }
+
+      registerUser({
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        role: "Manager",
+        password: data.password,
+      })
+
+      toast.success("Account created successfully. Please sign in.")
+      navigate("/login")
     }, 1000)
   }
 
@@ -34,7 +71,7 @@ export function RegisterPage() {
         </p>
       </div>
 
-      <form onSubmit={handleRegister} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">First name</Label>
@@ -45,11 +82,14 @@ export function RegisterPage() {
               <Input 
                 id="firstName" 
                 placeholder="John" 
-                required 
-                className="pl-10 h-11 bg-background"
+                className={`pl-10 h-11 bg-background ${errors.firstName ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 disabled={isLoading}
+                {...register("firstName")}
               />
             </div>
+            {errors.firstName && (
+              <p className="text-sm text-destructive">{errors.firstName.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Last name</Label>
@@ -60,11 +100,14 @@ export function RegisterPage() {
               <Input 
                 id="lastName" 
                 placeholder="Doe" 
-                required 
-                className="pl-10 h-11 bg-background"
+                className={`pl-10 h-11 bg-background ${errors.lastName ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 disabled={isLoading}
+                {...register("lastName")}
               />
             </div>
+            {errors.lastName && (
+              <p className="text-sm text-destructive">{errors.lastName.message}</p>
+            )}
           </div>
         </div>
 
@@ -77,11 +120,14 @@ export function RegisterPage() {
             <Input 
               id="company" 
               placeholder="Acme Inc." 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.company ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("company")}
             />
           </div>
+          {errors.company && (
+            <p className="text-sm text-destructive">{errors.company.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -94,11 +140,14 @@ export function RegisterPage() {
               id="email" 
               type="email" 
               placeholder="name@company.com" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-destructive">{errors.email.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -111,11 +160,14 @@ export function RegisterPage() {
               id="password" 
               type="password" 
               placeholder="••••••••" 
-              required 
-              className="pl-10 h-11 bg-background"
+              className={`pl-10 h-11 bg-background ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               disabled={isLoading}
+              {...register("password")}
             />
           </div>
+          {errors.password && (
+            <p className="text-sm text-destructive">{errors.password.message}</p>
+          )}
         </div>
 
         <Button type="submit" className="w-full h-11 text-base font-medium mt-6 group/btn" disabled={isLoading}>

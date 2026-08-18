@@ -13,12 +13,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Link, useNavigate } from "react-router-dom"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { MobileSidebar } from "./MobileSidebar"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { useState } from "react"
+import { useAppStore } from "@/store/useAppStore"
+import { toast } from "sonner"
 
 export function Header() {
   const { setTheme } = useTheme()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user } = useAppStore()
 
   return (
     <header className="h-16 border-b border-border/50 glass flex items-center justify-between px-4 md:px-6 shrink-0 z-10 sticky top-0">
@@ -37,7 +41,9 @@ export function Header() {
           </SheetContent>
         </Sheet>
         
-        <div className="relative w-full max-w-md hidden md:block">
+        <Breadcrumbs />
+
+        <div className="relative w-full max-w-md hidden lg:block ml-4">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
@@ -109,15 +115,14 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Avatar className="h-9 w-9 border cursor-pointer hover:opacity-80 transition-opacity">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>{user?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U'}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <div className="flex items-center justify-start gap-2 p-2">
               <div className="flex flex-col space-y-1 leading-none">
-                <p className="font-medium">Jane Doe</p>
-                <p className="w-[200px] truncate text-sm text-muted-foreground">jane.doe@antigravity.com</p>
+                <p className="font-medium">{user?.name || "User"}</p>
+                <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email || "user@example.com"}</p>
               </div>
             </div>
             <DropdownMenuSeparator />
@@ -125,7 +130,12 @@ export function Header() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/login")} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+            <DropdownMenuItem onClick={() => {
+              useAppStore.getState().setAuthenticated(false)
+              useAppStore.getState().setUser(null)
+              toast.success("Logged out successfully.")
+              navigate("/login")
+            }} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
