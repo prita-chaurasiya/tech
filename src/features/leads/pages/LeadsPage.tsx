@@ -92,7 +92,7 @@ export function LeadsPage() {
           </Button>
           
           <Dialog open={isAddLeadOpen} onOpenChange={setIsAddLeadOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 md:flex-none w-full md:w-auto mt-2 md:mt-0">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Lead

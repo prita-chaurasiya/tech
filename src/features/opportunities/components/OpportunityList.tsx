@@ -58,15 +58,13 @@ export function OpportunityList({ opportunities }: { opportunities: Opportunity[
                 <td className="px-6 py-4">
                   <Badge variant="outline" className="bg-background">{opp.stage}</Badge>
                 </td>
-                <td className="px-6 py-4 font-bold text-right">
-                  {formatCurrency(opp.expectedRevenue)}
-                </td>
+                <td className="px-6 py-4 font-semibold text-right">{formatCurrency(opp.expectedRevenue || 0)}</td>
                 <td className="px-6 py-4 text-right">
                   <span className="font-semibold text-primary">{opp.probability}%</span>
                 </td>
                 <td className="px-6 py-4 text-center">
-                  <Badge variant="outline" className={`font-bold ${getScoreColor(opp.aiDealScore)}`}>
-                    {opp.aiDealScore}
+                  <Badge variant="outline" className={`font-bold ${getScoreColor(opp.aiDealScore || 0)}`}>
+                    {opp.aiDealScore || 0}
                   </Badge>
                 </td>
                 <td className="px-6 py-4">

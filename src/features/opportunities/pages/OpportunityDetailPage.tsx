@@ -39,7 +39,7 @@ export function OpportunityDetailPage() {
           </div>
           <div className="flex items-center gap-4 text-muted-foreground text-sm mt-1">
             <span className="flex items-center gap-1.5"><Building2 size={14} /> {opp.customerName}</span>
-            <span className="flex items-center gap-1.5"><Calendar size={14} /> Expected Close: {new Date(opp.closeDate).toLocaleDateString()}</span>
+            <span className="flex items-center gap-1.5"><Calendar size={14} /> Expected Close: {opp.closeDate ? new Date(opp.closeDate).toLocaleDateString() : 'N/A'}</span>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -106,7 +106,7 @@ export function OpportunityDetailPage() {
                       <div className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
                         <DollarSign size={16} /> Deal Value
                       </div>
-                      <div className="text-3xl font-bold">{formatCurrency(opp.expectedRevenue)}</div>
+                      <div className="text-3xl font-bold">{formatCurrency(Number(opp.expectedRevenue) || 0)}</div>
                     </CardContent>
                   </Card>
                   <Card>

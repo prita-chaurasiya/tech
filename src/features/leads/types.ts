@@ -8,12 +8,12 @@ export interface Lead {
   email: string
   phone: string
   status: LeadStatus
-  source: LeadSource
+  source: string
   owner: string
   value: number
   score: number // AI Lead Score 0-100
   lastContact: string // ISO Date string
-  createdAt: string // ISO Date string
+  createdAt?: string // ISO Date string
   tags: string[]
 }
 

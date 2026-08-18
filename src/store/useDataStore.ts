@@ -16,6 +16,7 @@ export interface Lead {
   source: string
   lastContact: string
   tags: string[]
+  createdAt?: string
 }
 
 export interface Opportunity {
@@ -28,6 +29,15 @@ export interface Opportunity {
   expectedCloseDate: string
   owner: string
   priority: "High" | "Medium" | "Low"
+  customerName?: string
+  customerId?: string
+  closeDate?: string
+  expectedRevenue?: number
+  weightedRevenue?: number
+  aiDealScore?: number
+  aiRiskFactor?: "Low" | "Medium" | "High"
+  title?: string
+  customer?: string
 }
 
 export interface Customer {
@@ -92,7 +102,7 @@ const initialOpportunities: Opportunity[] = [
 import { mockCustomer } from "../features/customers/data/mockData"
 
 const initialCustomers: Customer[] = [
-  mockCustomer,
+  mockCustomer as unknown as Customer,
   { id: "C-002", name: "TechStart Inc", industry: "Technology", arr: 45000, healthScore: 85, status: "Active", renewalDate: "2024-08-15", owner: "Mike Chen", tier: "SMB" },
   { id: "C-003", name: "Global Finance LLC", industry: "Financial Services", arr: 850000, healthScore: 42, status: "At Risk", renewalDate: "2024-05-30", owner: "Emma Watson", tier: "Enterprise" },
   { id: "C-004", name: "Retail Solutions Hub", industry: "Retail", arr: 210000, healthScore: 78, status: "Active", renewalDate: "2024-10-15", owner: "David Kumar", tier: "Mid-Market" },

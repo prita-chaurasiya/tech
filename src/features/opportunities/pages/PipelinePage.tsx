@@ -22,19 +22,20 @@ export function PipelinePage() {
   const [isAddOpen, setIsAddOpen] = useState(false)
 
   const [newOpp, setNewOpp] = useState({
-    title: "",
-    customer: "",
+    name: "",
+    company: "",
     value: 0,
     stage: "Discovery" as const,
     probability: 20,
     expectedCloseDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    owner: "Jane Doe"
+    owner: "Jane Doe",
+    priority: "Medium" as const
   })
 
   const handleExport = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
       + "Title,Customer,Value,Stage,Probability\n"
-      + opportunities.map(e => `${e.title},${e.customer},${e.value},${e.stage},${e.probability}%`).join("\n");
+      + opportunities.map(e => `${e.name},${e.company},${e.value},${e.stage},${e.probability}%`).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -45,17 +46,18 @@ export function PipelinePage() {
   }
 
   const handleAdd = () => {
-    if (!newOpp.title || !newOpp.customer) return
+    if (!newOpp.name || !newOpp.company) return
     addOpportunity(newOpp)
     setIsAddOpen(false)
     setNewOpp({
-      title: "",
-      customer: "",
+      name: "",
+      company: "",
       value: 0,
       stage: "Discovery",
       probability: 20,
       expectedCloseDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      owner: "Jane Doe"
+      owner: "Jane Doe",
+      priority: "Medium"
     })
   }
 
@@ -76,7 +78,7 @@ export function PipelinePage() {
           </Button>
 
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 md:flex-none w-full md:w-auto mt-2 md:mt-0">
                 <Plus className="mr-2 h-4 w-4" /> New Deal
               </Button>
@@ -88,11 +90,11 @@ export function PipelinePage() {
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label>Opportunity Title</Label>
-                  <Input value={newOpp.title} onChange={e => setNewOpp({...newOpp, title: e.target.value})} />
+                  <Input value={newOpp.name} onChange={e => setNewOpp({...newOpp, name: e.target.value})} />
                 </div>
                 <div className="grid gap-2">
                   <Label>Customer/Account</Label>
-                  <Input value={newOpp.customer} onChange={e => setNewOpp({...newOpp, customer: e.target.value})} />
+                  <Input value={newOpp.company} onChange={e => setNewOpp({...newOpp, company: e.target.value})} />
                 </div>
                 <div className="grid gap-2">
                   <Label>Expected Value (₹)</Label>
@@ -105,7 +107,7 @@ export function PipelinePage() {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-                <Button onClick={handleAdd} disabled={!newOpp.title || !newOpp.customer}>Save Deal</Button>
+                <Button onClick={handleAdd} disabled={!newOpp.name || !newOpp.company}>Save Deal</Button>
               </div>
             </DialogContent>
           </Dialog>

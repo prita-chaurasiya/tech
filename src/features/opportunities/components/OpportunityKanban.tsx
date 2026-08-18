@@ -49,7 +49,7 @@ export function OpportunityKanban({ opportunities: initialOpps }: { opportunitie
       <DragDropContext onDragEnd={onDragEnd}>
         {STAGES.map((stage) => {
           const columnOpps = opportunities.filter(o => o.stage === stage)
-          const totalValue = columnOpps.reduce((sum, opp) => sum + opp.expectedRevenue, 0)
+          const totalValue = columnOpps.reduce((sum, opp) => sum + (opp.expectedRevenue || 0), 0)
 
           return (
             <div key={stage} className="flex-shrink-0 w-[340px] bg-muted/40 rounded-lg flex flex-col max-h-full border">
@@ -105,7 +105,7 @@ export function OpportunityKanban({ opportunities: initialOpps }: { opportunitie
                                   <div className="grid grid-cols-2 gap-2 mb-3">
                                     <div className="bg-muted/50 p-1.5 rounded flex flex-col items-center justify-center">
                                       <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Value</span>
-                                      <span className="font-bold text-xs">{formatCurrency(opp.expectedRevenue)}</span>
+                                      <div className="font-bold text-xs">{formatCurrency(opp.expectedRevenue || 0)}</div>
                                     </div>
                                     <div className="bg-muted/50 p-1.5 rounded flex flex-col items-center justify-center">
                                       <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Prob.</span>
@@ -115,8 +115,8 @@ export function OpportunityKanban({ opportunities: initialOpps }: { opportunitie
 
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${getScoreColor(opp.aiDealScore)}`}>
-                                        Score: {opp.aiDealScore}
+                                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${getScoreColor(opp.aiDealScore || 0)}`}>
+                                        Score: {opp.aiDealScore || 0}
                                       </span>
                                       {opp.aiRiskFactor === "High" && (
                                         <AlertTriangle size={14} className="text-red-500" />

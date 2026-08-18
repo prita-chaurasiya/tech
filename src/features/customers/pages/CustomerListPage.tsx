@@ -94,7 +94,7 @@ export function CustomerListPage() {
           </Button>
 
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button size="sm" className="flex-1 md:flex-none w-full md:w-auto mt-2 md:mt-0">
                 <Plus className="mr-2 h-4 w-4" /> Add Customer
               </Button>
@@ -185,10 +185,10 @@ export function CustomerListPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full font-bold text-xs ${getHealthColor(customer.health)}`}>
-                          {customer.health}/100
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-xs ${getHealthColor(customer.healthScore)}`}>
+                          {customer.healthScore}/100
                         </span>
-                        {customer.health < 60 && <Badge variant="outline" className="text-red-500 border-red-200 bg-red-50 text-[10px]">Churn Risk</Badge>}
+                        {customer.healthScore < 60 && <Badge variant="outline" className="text-red-500 border-red-200 bg-red-50 text-[10px]">Churn Risk</Badge>}
                       </div>
                     </td>
                     <td className="px-6 py-4">

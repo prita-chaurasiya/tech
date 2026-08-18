@@ -17,7 +17,7 @@ export function PipelineAnalytics({ opportunities }: { opportunities: Opportunit
   
   opportunities.forEach(opp => {
     if (stageMap[opp.stage as keyof typeof stageMap] !== undefined) {
-      stageMap[opp.stage as keyof typeof stageMap] += opp.expectedRevenue
+      stageMap[opp.stage as keyof typeof stageMap] += (opp.expectedRevenue || 0)
     }
   })
 
